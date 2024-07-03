@@ -1,0 +1,22 @@
+{
+    "name": "Indicium Tech - Engenharia de Dados",
+    "build": { "dockerfile": "Dockerfile" },
+    "features": { "ghcr.io/devcontainers/features/java:1": "17", "ghcr.io/devcontainers/features/node:1": "20" },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "eamodio.gitlens",
+                "editorconfig.editorconfig",
+                "sonarsource.sonarlint-vscode",
+                "redhat.vscode-yaml",
+                "oderwat.indent-rainbow",
+                "charliermarsh.ruff"
+            ],
+            "settings": {
+                "[python]": { "editor.defaultFormatter": "charliermarsh.ruff" },
+                "python.analysis.autoImportCompletions": true
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+version: 1
+default_environment: dev
+project_id: 85bc821f-6d7d-41c7-8d2d-bc4e8b85906c
+environments:
+- name: dev
+- name: staging
+- name: prod
+send_anonymous_usage_stats: false
