@@ -1,8 +1,16 @@
-version: '3'
+name: lh-ed-maksuel-nascimento
 
 services:
+  meltano:
+    build: .
+    image: meltano:v3.4-python3.11
+    container_name: indiciumtech-meltano
+    ports:
+      - 8080:8080
+
   db:
     image: postgres:12
+    container_name: indiciumtech-postgres
     environment:
       POSTGRES_DB: northwind
       POSTGRES_USER: northwind_user
