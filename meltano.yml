@@ -6,3 +6,41 @@ environments:
 - name: staging
 - name: prod
 send_anonymous_usage_stats: false
+plugins:
+  extractors:
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      files:
+      - entity: order_details
+        path: data/order_details.csv
+        keys:
+        - order_id
+        - product_id
+        - unit_price
+        - quantity
+        - discount
+  loaders:
+  - name: target-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-csv.git
+    config:
+      destination_path: data/
+  - name: target-local-from-csv
+    inherit_from: target-csv
+    config:
+      file_naming_scheme: csv/{datestamp}/{stream_name}.csv
+  utilities:
+  - name: airflow
+    variant: apache
+    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1
+      --constraint 
+      https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
+schedules:
+- name: csv-local-filesystem
+  interval: '@daily'
+  extractor: tap-csv
+  loader: target-local-from-csv
+  transform: skip
+  start_date: 2024-07-01 00:00:00

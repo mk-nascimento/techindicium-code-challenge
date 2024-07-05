@@ -194,5 +194,8 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,python
 
-.dbdata
-.meltano
+.meltano/
+data/csv/
+dbdata/
+airflow.cfg
+webserver_config.py
