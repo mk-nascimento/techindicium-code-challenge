@@ -15,7 +15,8 @@
             ],
             "settings": {
                 "[python]": { "editor.defaultFormatter": "charliermarsh.ruff" },
-                "python.analysis.autoImportCompletions": true
+                "python.analysis.autoImportCompletions": true,
+                "terminal.integrated.defaultProfile.linux": "zsh"
             }
         }
     }
