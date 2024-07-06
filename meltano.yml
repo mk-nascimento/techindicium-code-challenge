@@ -21,6 +21,15 @@ plugins:
         - unit_price
         - quantity
         - discount
+  - name: tap-postgres
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-postgres.git
+    config:
+      host: db
+      user: northwind_user
+      database: northwind
+      filter_schemas:
+      - public
   loaders:
   - name: target-csv
     variant: meltanolabs
@@ -31,6 +40,10 @@ plugins:
     inherit_from: target-csv
     config:
       file_naming_scheme: csv/{datestamp}/{stream_name}.csv
+  - name: target-local-from-postgres
+    inherit_from: target-csv
+    config:
+      file_naming_scheme: postgres/{stream_name}/{datestamp}/{stream_name}.csv
   utilities:
   - name: airflow
     variant: apache
@@ -42,5 +55,11 @@ schedules:
   interval: '@daily'
   extractor: tap-csv
   loader: target-local-from-csv
+  transform: skip
+  start_date: 2024-07-01 00:00:00
+- name: postgres-local-filesystem
+  interval: '@daily'
+  extractor: tap-postgres
+  loader: target-local-from-postgres
   transform: skip
   start_date: 2024-07-01 00:00:00
