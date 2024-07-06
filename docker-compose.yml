@@ -3,38 +3,22 @@ name: lh-ed-maksuel-nascimento
 networks:
   database:
     name: meltano-database
-  airflow:
-    name: meltano-airflow
 
 services:
-  scheduler:
+  airflow-ui:
     build:
       context: .
-      target: scheduler
-    image: meltano:airflow-scheduler
-    container_name: indiciumtech-meltano-scheduler
+      target: ui
+    image: meltano:airflow-ui
+    container_name: indiciumtech-meltano-airflow
     restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
-      - airflow
       - database
     ports:
       - 8793:8793
-
-  webserver:
-    build:
-      context: .
-      target: webserver
-    image: meltano:airflow-webserver
-    container_name: indiciumtech-meltano-webserver
-    restart: unless-stopped
-    depends_on:
-      - scheduler
-    networks:
-      - airflow
-      - database
-    ports:
       - 8080:8080
 
   db:
@@ -44,6 +28,11 @@ services:
       POSTGRES_DB: northwind
       POSTGRES_USER: northwind_user
       POSTGRES_PASSWORD: thewindisblowing
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - database
     volumes:
