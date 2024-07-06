@@ -1,5 +1,5 @@
 FROM python:3.11-slim-bookworm AS base
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 PATH=${PATH}:/root/.local/bin
 
 RUN <<EOF
     apt-get update
@@ -8,7 +8,6 @@ RUN <<EOF
 EOF
 RUN python -m pip install --no-cache-dir --quiet --upgrade --user pip "meltano==3.4" wheel
 
-ENV PATH=${PATH}:/root/.local/bin
 
 FROM base AS installer
 ENV TAP_POSTGRES_PASSWORD=thewindisblowing
