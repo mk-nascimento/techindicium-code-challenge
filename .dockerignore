@@ -1,0 +1,4 @@
+.meltano
+dbdata
+data/csv
+data/postgres
