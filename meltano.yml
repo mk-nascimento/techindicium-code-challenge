@@ -11,16 +11,6 @@ plugins:
   - name: tap-csv
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
-    config:
-      files:
-      - entity: order_details
-        path: data/order_details.csv
-        keys:
-        - order_id
-        - product_id
-        - unit_price
-        - quantity
-        - discount
   - name: tap-postgres
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/tap-postgres.git
@@ -30,17 +20,29 @@ plugins:
       database: northwind
       filter_schemas:
       - public
+  - name: tap-order_details
+    inherit_from: tap-csv
+    config:
+      files:
+      - entity: public-order_details
+        path: data/order_details.csv
+        keys:
+        - order_id
+        - product_id
+        - unit_price
+        - quantity
+        - discount
   loaders:
   - name: target-csv
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/target-csv.git
     config:
       destination_path: data/
-  - name: target-local-from-csv
+  - name: csv-to-local
     inherit_from: target-csv
     config:
       file_naming_scheme: csv/{datestamp}/{stream_name}.csv
-  - name: target-local-from-postgres
+  - name: postgres-to-local
     inherit_from: target-csv
     config:
       file_naming_scheme: postgres/{stream_name}/{datestamp}/{stream_name}.csv
@@ -53,13 +55,13 @@ plugins:
 schedules:
 - name: csv-local-filesystem
   interval: '@daily'
-  extractor: tap-csv
-  loader: target-local-from-csv
+  extractor: tap-order_details
+  loader: csv-to-local
   transform: skip
   start_date: 2024-07-01 00:00:00
 - name: postgres-local-filesystem
   interval: '@daily'
   extractor: tap-postgres
-  loader: target-local-from-postgres
+  loader: postgres-to-local
   transform: skip
   start_date: 2024-07-01 00:00:00
