@@ -56,6 +56,8 @@ plugins:
       user: northwind_user
       database: southwind
       default_target_schema: public
+      activate_version: false
+      add_record_metadata: false
   utilities:
   - name: airflow
     variant: apache
