@@ -32,6 +32,8 @@ plugins:
         - unit_price
         - quantity
         - discount
+  - name: tap-local
+    inherit_from: tap-csv
   loaders:
   - name: target-csv
     variant: meltanolabs
@@ -46,6 +48,14 @@ plugins:
     inherit_from: target-csv
     config:
       file_naming_scheme: postgres/{stream_name}/{datestamp}/{stream_name}.csv
+  - name: target-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-target-postgres
+    config:
+      host: db
+      user: northwind_user
+      database: southwind
+      default_target_schema: public
   utilities:
   - name: airflow
     variant: apache

@@ -10,7 +10,9 @@ RUN python -m pip install --no-cache-dir --quiet --upgrade --user pip "meltano==
 
 
 FROM base AS installer
-ENV TAP_POSTGRES_PASSWORD=thewindisblowing
+ARG POSTGRES_PASSWORD=thewindisblowing
+ENV TAP_POSTGRES_PASSWORD=${POSTGRES_PASSWORD} TARGET_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
 WORKDIR /project
 
 COPY . .
