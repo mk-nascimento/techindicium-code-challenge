@@ -196,6 +196,7 @@ pyrightconfig.json
 
 .meltano/
 data/csv/
+data/postgres/
 dbdata/
 airflow.cfg
 webserver_config.py
