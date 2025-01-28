@@ -1,84 +1,111 @@
 # Indicium Tech Code Challenge
 
-Code challenge for Software Developer with focus in data projects.
+## Visão Geral
 
+Este repositório contém a solução para o [Indicium Tech Code Challenge](CHALLENGE.md). O objetivo foi construir um pipeline de dados que extrai dados de duas fontes: um banco de dados PostgreSQL (northwind) e um arquivo CSV representando os detalhes de pedidos. O pipeline carrega os dados extraídos em um banco de dados PostgreSQL.
 
-## Context
+## Requisitos
 
-At Indicium we have many projects where we develop the whole data pipeline for our client, from extracting data from many data sources to loading this data at its final destination, with this final destination varying from a data warehouse for a Business Intelligency tool to an api for integrating with third party systems.
+- **Docker** e **Docker Compose** (ou o plugin Compose do Docker) para configuração de ambientes isolados e execução dos containers.
 
-As a software developer with focus in data projects your mission is to plan, develop, deploy, and maintain a data pipeline.
+## Setup
 
+### 1. Instale o Docker e Docker Compose
 
-## The Challenge
+Certifique-se de que o **Docker** e o **Docker Compose** estão instalados em sua máquina. Se não tiver, siga as instruções de instalação:
 
-We are going to provide 2 data sources, a PostgreSQL database and a CSV file.
+- [Instalar Docker](https://docs.docker.com/get-docker/)
+- [Instalar Docker Compose](https://docs.docker.com/compose/install/)
 
-The CSV file represents details of orders from an ecommerce system.
+### 2. Clone o Repositório
 
-The database provided is a sample database provided by microsoft for education purposes called northwind, the only difference is that the **order_detail** table does not exists in this database you are beeing provided with. This order_details table is represented by the CSV file we provide.
-
-Schema of the original Northwind Database: 
-
-![image](https://user-images.githubusercontent.com/49417424/105997621-9666b980-608a-11eb-86fd-db6b44ece02a.png)
-
-Your challenge is to build a pipeline that extracts the data everyday from both sources and write the data first to local disk, and second to a PostgreSQL database. For this challenge, the CSV file and the database will be static, but in any real world project, both data sources would be changing constantly.
-
-Its important that all writing steps (writing data from inputs to local filesystem and writing data from local filesystem to PostgreSQL database) are isolated from each other, you shoud be able to run any step without executing the others.
-
-For the first step, where you write data to local disk, you should write one file for each table. This pipeline will run everyday, so there should be a separation in the file paths you will create for each source(CSV or Postgres), table and execution day combination, e.g.:
-
-```
-/data/postgres/{table}/2024-01-01/file.format
-/data/postgres/{table}/2024-01-02/file.format
-/data/csv/2024-01-02/file.format
+```bash
+git clone https://github.com/mk-nascimento/techindicium-code-challenge.git
+cd indicium-tech-code-challenge
 ```
 
-You are free to chose the naming and the format of the file you are going to save.
+### 3. Configure o Ambiente Docker
 
-At step 2, you should load the data from the local filesystem, which you have created, to the final database.
+Com o **Docker Compose**, podemos facilmente definir e orquestrar os containers necessários para rodar o pipeline. Execute o seguinte comando para iniciar os serviços:
 
-The final goal is to be able to run a query that shows the orders and its details. The Orders are placed in a table called **orders** at the postgres Northwind database. The details are placed at the csv file provided, and each line has an **order_id** field pointing the **orders** table.
+#### **Opção 1: Comando clássico**
+Caso o Docker Compose esteja instalado como uma ferramenta independente, execute:
+```bash
+docker-compose up --build
+```
 
-## Solution Diagram
+#### **Opção 2: Comando com o plugin do Docker Compose**
+Se você utiliza o Docker Compose como um plugin do Docker CLI, o comando será:
+```bash
+docker compose up --build
+```
 
-As Indicium uses some standard tools, the challenge was designed to be done using some of these tools.
+Isso irá:
 
-The following tools should be used to solve this challenge.
+- Iniciar o **PostgreSQL** com o banco de dados `northwind` e output no`southwind`.
+- Configurar o **Meltano** para extração e carregamento de dados.
+- Iniciar o **Airflow** para orquestrar o pipeline.
 
-Scheduler:
-- [Airflow](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)
+### 4. Acesse a Interface do Airflow
 
-Data Loader:
-- [Embulk](https://www.embulk.org) (Java Based)
-**OR**
-- [Meltano](https://docs.meltano.com/?_gl=1*1nu14zf*_gcl_au*MTg2OTE2NDQ4Mi4xNzA2MDM5OTAz) (Python Based)
+Após os containers estarem rodando, você pode acessar a interface do Airflow através de:
 
-Database:
-- [PostgreSQL](https://www.postgresql.org/docs/15/index.html)
+```
+http://localhost:8080
+```
+> **login**: `admin`
+> **password**: `pass`
 
-The solution should be based on the diagrams below:
-![image](docs/diagrama_embulk_meltano.jpg)
+A partir daí, você pode monitorar o progresso do pipeline, se necessário.
 
+### 5. Extração e o Carregamento de Dados
 
-### Requirements
+O pipeline é composto pelas seguintes etapas:
 
-- You **must** use the tools described above to complete the challenge.
-- All tasks should be idempotent, you should be able to run the pipeline everyday and, in this case where the data is static, the output shold be the same.
-- Step 2 depends on both tasks of step 1, so you should not be able to run step 2 for a day if the tasks from step 1 did not succeed.
-- You should extract all the tables from the source database, it does not matter that you will not use most of them for the final step.
-- You should be able to tell where the pipeline failed clearly, so you know from which step you should rerun the pipeline.
-- You have to provide clear instructions on how to run the whole pipeline. The easier the better.
-- You must provide evidence that the process has been completed successfully, i.e. you must provide a csv or json with the result of the query described above.
-- You should assume that it will run for different days, everyday.
-- Your pipeline should be prepared to run for past days, meaning you should be able to pass an argument to the pipeline with a day from the past, and it should reprocess the data for that day. Since the data for this challenge is static, the only difference for each day of execution will be the output paths.
+1. **Extração de Dados:**
+   - Extrair tabelas do banco de dados PostgreSQL.
+   - Extrair detalhes de pedidos do arquivo CSV.
 
-### Things that Matters
+2. **Carregamento de Dados:**
+   - Escrever os dados extraídos no sistema de arquivos local, organizados por tabela e data.
+   - Carregar os dados extraídos do sistema de arquivos para o PostgreSQL (`southwind`).
 
-- Clean and organized code.
-- Good decisions at which step (which database, which file format..) and good arguments to back those decisions up.
-- The aim of the challenge is not only to assess technical knowledge in the area, but also the ability to search for information and use it to solve problems with tools that are not necessarily known to the candidate.
-- Point and click tools are not allowed.
+### 6. Execute o Pipeline
 
+Você pode acionar o pipeline manualmente através da interface do Airflow. Por padrão, o pipeline será executado diariamente às 00:00 GMT.
 
-Thank you for participating!
+### 7. Verifique os Resultados
+
+Após a execução bem-sucedida do pipeline, a união dos dados no PostgreSQL foi exportada para [CSV](orders_with_details.csv) com a seguinte Query:
+
+```sql
+southwind=# \copy (SELECT * FROM orders o JOIN order_details od ON o.order_id = od.order_id) TO '/order_with_details.csv' DELIMITER ',' CSV HEADER;
+```
+
+Exporte os resultados para CSV ou JSON para demonstrar que o pipeline funciona como esperado.
+
+## Nomeação e Organização de Arquivos
+
+Conforme proposto para separação dos dados, a seguinte estrutura de diretórios é usada para armazenar os arquivos:
+
+- **Arquivos [CSV](/data/csv/):**
+  ```
+  /data/csv/2025-01-01/file.csv
+  /data/csv/2025-01-02/file.csv
+  ```
+
+- **Arquivos do [PostgreSQL](/data/postgres/):**
+  ```
+  /data/postgres/{table}/2025-01-01/orders.csv
+  /data/postgres/{table}/2025-01-02/order_details.csv
+  ```
+
+## Solução de Problemas
+
+### 1. Logs e Diagnóstico de Falhas
+
+Em caso de falha, a interface do Airflow fornece logs detalhados para cada tarefa. Os logs das tarefas indicarão onde a falha ocorreu, seja durante a extração, gravação no disco ou carregamento no PostgreSQL.
+
+## Conclusão
+
+Esta solução demonstra um pipeline de dados que extrai dados de um banco de dados PostgreSQL e de um arquivo CSV, grava-os no sistema de arquivos local e carrega-os no PostgreSQL para análise. Foi utilizado **Airflow** para orquestração e **Meltano** para extração e carregamento de dados.
