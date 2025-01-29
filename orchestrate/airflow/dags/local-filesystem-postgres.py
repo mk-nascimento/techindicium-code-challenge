@@ -63,16 +63,16 @@ with DAG(
         external_dag_id="meltano_csv-local-filesystem",
         allowed_states=["success"],
         mode="reschedule",
-        timeout=60,
-        poke_interval=15,
+        timeout=60*2.5,
+        poke_interval=45,
     )
     postgres_local_task = ExternalTaskSensor(
         task_id="postgres-local-task",
         external_dag_id="meltano_postgres-local-filesystem",
         allowed_states=["success"],
         mode="reschedule",
-        timeout=60,
-        poke_interval=15,
+        timeout=60*2.5,
+        poke_interval=45,
     )
     get_csv_file_definition = PythonOperator(
         task_id="get-csv-file-definition",
