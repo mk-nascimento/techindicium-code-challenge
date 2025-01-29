@@ -72,7 +72,39 @@ O pipeline é composto pelas seguintes etapas:
 
 ### 6. Execute o Pipeline
 
-Você pode acionar o pipeline manualmente através da interface do Airflow. Por padrão, o pipeline será executado diariamente às 00:00 GMT.
+#### Execução via GUI (Graphical User Interface)
+
+Você pode acionar o pipeline manualmente através da interface do Airflow. Por padrão, o pipeline é programado para executar diariamente às 00:00 GMT.
+
+#### Execução via CLI (Command Line Interface)
+
+1. **[Entre](https://docs.docker.com/reference/cli/docker/compose/exec/) no Bash do container**
+
+   Acesse o bash do container `airflow-ui` e execute os comandos diretamente:
+   ```bash
+   docker compose exec airflow-ui bash # ou docker-compose exec airflow-ui bash
+   ```
+
+2. **[Liste](https://airflow.apache.org/docs/apache-airflow/stable/cli-and-env-variables-ref.html#list_repeat2) as DAGs disponíveis**
+
+   Uma vez dentro do bash do container, liste as DAGs configuradas com o seguinte comando:
+   ```bash
+   meltano invoke airflow dags list
+   ```
+
+3. **[Execute](https://airflow.apache.org/docs/apache-airflow/stable/cli-and-env-variables-ref.html#trigger) uma DAG manualmente**
+
+   Para disparar a execução de uma DAG específica, use o comando abaixo, substituindo `dag_id` pelo identificador da DAG exibido na listagem:
+   ```bash
+   meltano invoke airflow dags trigger dag_id
+   ```
+
+4. **Executar uma DAG com data como parâmetro**
+
+   Para executar uma DAG em uma data específica, utilize o parâmetro `-e` seguido da data no formato `YYYY-MM-DD`:
+   ```bash
+   meltano invoke airflow dags trigger -e 2024-12-25 dag_id
+   ```
 
 ### 7. Verifique os Resultados
 
